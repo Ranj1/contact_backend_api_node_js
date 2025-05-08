@@ -1,4 +1,3 @@
-console.log("hello world");
 const express = require("express");
 const errorHandler = require("./middleware/errorHandler");
 const connectDB = require("./config/dbConnection");
