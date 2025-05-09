@@ -31,12 +31,10 @@ const createContact = asyncHandler(async (req,res) => {
 //@route GET /api/contacts
 //@access public
 const getContact = asyncHandler (async (req,res) => {
-    console.log("get contact " + req.params);
-    console.log("get contact " + req.params.id);
+    
     const contact = await Contact.findById(req.params.id);
-    console.log("contact",contact);
-    console.log(res.status)
-;    if(!contact){
+    
+  if(!contact || contact.length === 0){
         console.log("contact not found");
         res.status(400);
         throw Error(
