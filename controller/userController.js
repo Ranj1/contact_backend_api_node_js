@@ -1,6 +1,7 @@
 const  asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
 const User = require("../model/userModel");
+const jwt  = require("jsonwebtoken");
 //@desc Register User
 //@route POST /api/users/register
 //@access public
@@ -14,7 +15,8 @@ const registerUser = asyncHandler (async (req,res) => {
     }
 
      const userAvailable = await User.findOne({email});
-     if(userAvailable || userAvailable == null){
+     console.log("userAvailable",userAvailable);
+     if(userAvailable || userAvailable != null){
         res.status(400);
         throw new Error("User alredy exists");
     }
@@ -40,7 +42,34 @@ const registerUser = asyncHandler (async (req,res) => {
 //@access public
 const loginUser = asyncHandler (async (req,res) => {
     const {email,password} = req.body;
-    res.json({message:"User Login"});
+
+    if(!email || !password){
+        res.status(400);
+        throw new Error("All fields are required")
+    }
+
+    const userAvailable  = await User.findOne({email});
+
+    if(userAvailable && await bcrypt.compare(password,userAvailable.password)){
+        const accessToken  = jwt.sign(
+            {
+            user:{
+                username:userAvailable.username,
+                email:userAvailable.email,
+                id:userAvailable.id
+            }
+           },
+           process.env.JWT_SECRET,
+           {
+            expiresIn:"1m"
+           }
+    );
+    res.status(200).json({accessToken});
+    }else{
+        res.status(400);
+        throw new Error("Invalid credentials");
+    }
+    
 });
 
 
