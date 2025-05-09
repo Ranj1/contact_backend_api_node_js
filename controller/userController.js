@@ -2,11 +2,13 @@ const  asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
 const User = require("../model/userModel");
 const jwt  = require("jsonwebtoken");
+
 //@desc Register User
 //@route POST /api/users/register
 //@access public
+
 const registerUser = asyncHandler (async (req,res) => {
-    //console.log(req.body);
+    
     const {username,email,password} = req.body;
 
     if(!username || !email || !password ){
@@ -38,7 +40,7 @@ const registerUser = asyncHandler (async (req,res) => {
 });
 
 //@desc Login User
-//@route POST /api/users/register
+//@route POST /api/users/login
 //@access public
 const loginUser = asyncHandler (async (req,res) => {
     const {email,password} = req.body;
