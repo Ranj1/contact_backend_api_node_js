@@ -44,34 +44,38 @@ const registerUser = asyncHandler (async (req,res) => {
 //@access public
 const loginUser = asyncHandler (async (req,res) => {
     const {email,password} = req.body;
-
-    if(!email || !password){
-        res.status(400);
-        throw new Error("All fields are required")
-    }
-
-    const userAvailable  = await User.findOne({email});
-
-    if(userAvailable && await bcrypt.compare(password,userAvailable.password)){
-        const accessToken  = jwt.sign(
-            {
-            user:{
-                username:userAvailable.username,
-                email:userAvailable.email,
-                id:userAvailable.id
-            }
-           },
-           process.env.JWT_SECRET,
-           {
-            expiresIn:"1m"
-           }
-    );
-    res.status(200).json({accessToken});
-    }else{
-        res.status(400);
-        throw new Error("Invalid credentials");
-    }
+     try{
+        if(!email || !password){
+            res.status(400);
+            throw new Error("All fields are required")
+        }
     
+        const userAvailable  = await User.findOne({email});
+    
+        if(userAvailable && await bcrypt.compare(password,userAvailable.password)){
+            const accessToken  = jwt.sign(
+                {
+                user:{
+                    username:userAvailable.username,
+                    email:userAvailable.email,
+                    id:userAvailable.id
+                }
+               },
+               process.env.JWT_SECRET,
+               {
+                expiresIn:"15m"
+               }
+        );
+        res.status(200).json({accessToken});
+        }else{
+            res.status(400);
+            throw new Error("Invalid credentials");
+        }
+
+     }catch(error){
+        res.status(400);
+        throw new Error(error);
+    }
 });
 
 
@@ -79,7 +83,7 @@ const loginUser = asyncHandler (async (req,res) => {
 //@route POST /api/users/register
 //@access private
 const currentUser = asyncHandler (async (req,res) => {
-    res.json({message:"User Current"});
+    res.json({user: req.user});
 });
 
 
